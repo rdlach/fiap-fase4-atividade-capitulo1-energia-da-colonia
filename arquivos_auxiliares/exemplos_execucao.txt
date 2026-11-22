@@ -1,0 +1,405 @@
+######################################################################
+#  SIGIC - DEMONSTRAÇÃO AUTOMÁTICA DE TODAS AS FUNCIONALIDADES
+######################################################################
+
+======================================================================
+ MÓDULOS DA COLÔNIA
+======================================================================
+  Sigla Nome                       Consumo  Prioridade    Armaz.  Comunic.       Status
+  --------------------------------------------------------------------------------------------
+  AE    Armazenamento de Energia     5.0kW  1-Crítica     2000kWh  baixa( 30/min) ativo
+  CC    Centro de Controle          12.0kW  2-Alta          40kWh  alta (120/min) ativo
+  H     Habitação                   18.0kW  1-Crítica       50kWh  média( 40/min) ativo
+  AG    Agricultura                 22.0kW  3-Média         30kWh  baixa( 20/min) ativo
+  LC    Laboratório Científico      15.0kW  4-Baixa         25kWh  média( 60/min) ativo
+  CM    Comunicação                 10.0kW  2-Alta          20kWh  alta (150/min) ativo
+  SM    Suporte Médico               9.0kW  1-Crítica       35kWh  média( 50/min) ativo
+  PO    Produção de Oxigênio        25.0kW  1-Crítica       60kWh  baixa( 30/min) ativo
+
+  Consumo total dos módulos operando: 116.0 kW
+  Geração nominal disponível: 180.0 kW (Painéis solares: 120 kW, Turbinas eólicas: 20 kW, Reator compacto de fissão: 40 kW)
+
+======================================================================
+ MAPA DA REDE DA COLÔNIA AURORA SIGER
+======================================================================
+
+                         [CM] Comunicação
+                           |
+                          80m
+                           |
+  [LC] -------55m------- [CC] -------60m------- [SM]
+    |    Laboratório    /  Centro de \    Suporte |
+   65m                40m  Controle   45m  Médico 30m
+    |                 /                \          |
+  [AG] -----70m----- [AE] -----60m----- [H ] -----+
+    Agricultura  \   Armaz. Energia   /  Habitação
+                 45m       |        40m
+                   \      35m       /
+                    \      |       /
+                     +--- [PO] ---+
+                     Produção de Oxigênio
+
+Pesos mostrados: distância em metros. Cada conexão também possui
+resistência elétrica (perda) e latência de comunicação.
+
+--- Lista de adjacência  [vizinho (distância m | perda mΩ | latência ms)] 
+  AE [ativo        ] -> CC(40|32.0|3), PO(35|28.0|3), H(60|48.0|4), AG(70|70.0|5)
+  CC [ativo        ] -> AE(40|32.0|3), H(45|36.0|2), LC(55|44.0|2), CM(80|48.0|1), SM(60|48.0|2)
+   H [ativo        ] -> AE(60|48.0|4), CC(45|36.0|2), SM(30|45.0|3), PO(40|32.0|4)
+  AG [ativo        ] -> AE(70|70.0|5), PO(45|36.0|4), LC(65|65.0|5)
+  LC [ativo        ] -> CC(55|44.0|2), AG(65|65.0|5)
+  CM [ativo        ] -> CC(80|48.0|1)
+  SM [ativo        ] -> CC(60|48.0|2), H(30|45.0|3)
+  PO [ativo        ] -> AE(35|28.0|3), H(40|32.0|4), AG(45|36.0|4)
+
+--- Matriz de adjacência binária (1 = conectado) --------------------
+           AE     CC      H     AG     LC     CM     SM     PO
+   AE       .      1      1      1      .      .      .      1
+   CC       1      .      1      .      1      1      1      .
+    H       1      1      .      .      .      .      1      1
+   AG       1      .      .      .      1      .      .      1
+   LC       .      1      .      1      .      .      .      .
+   CM       .      1      .      .      .      .      .      .
+   SM       .      1      1      .      .      .      .      .
+   PO       1      .      1      1      .      .      .      .
+
+--- Matriz de adjacência de pesos - Distância (m) -------------------
+           AE     CC      H     AG     LC     CM     SM     PO
+   AE       .     40     60     70      .      .      .     35
+   CC      40      .     45      .     55     80     60      .
+    H      60     45      .      .      .      .     30     40
+   AG      70      .      .      .     65      .      .     45
+   LC       .     55      .     65      .      .      .      .
+   CM       .     80      .      .      .      .      .      .
+   SM       .     60     30      .      .      .      .      .
+   PO      35      .     40     45      .      .      .      .
+
+Total: 8 módulos (vértices) e 12 conexões (arestas).
+
+--- Matriz de adjacência de pesos - Resistência elétrica (proxy de perda) (mΩ) 
+           AE     CC      H     AG     LC     CM     SM     PO
+   AE       .   32.0   48.0   70.0      .      .      .   28.0
+   CC    32.0      .   36.0      .   44.0   48.0   48.0      .
+    H    48.0   36.0      .      .      .      .   45.0   32.0
+   AG    70.0      .      .      .   65.0      .      .   36.0
+   LC       .   44.0      .   65.0      .      .      .      .
+   CM       .   48.0      .      .      .      .      .      .
+   SM       .   48.0   45.0      .      .      .      .      .
+   PO    28.0      .   32.0   36.0      .      .      .      .
+
+======================================================================
+ CONSULTA DO MÓDULO Suporte Médico (SM)
+======================================================================
+  sigla               : SM
+  nome                : Suporte Médico
+  consumo_kw          : 9.0
+  prioridade          : 1
+  capacidade_kwh      : 35.0
+  comunicacao_msg_min : 50
+  descricao           : Atendimento médico e monitoramento da saúde da tripulação.
+  prioridade (texto)  : Crítica
+  comunicação         : necessidade média
+  status              : ativo
+
+  Conexões diretas:
+    - Centro de Controle (CC)             60 m |  48.0 mΩ | 2 ms
+    - Habitação (H)                       30 m |  45.0 mΩ | 3 ms
+
+  Rota de energia a partir do AE: AE -> CC -> SM (80.0 mΩ)
+  Se este módulo falhar, ficam sem energia: nenhum outro módulo (índice de criticidade 0)
+
+======================================================================
+ ENVIO DE ENERGIA: Armazenamento de Energia (AE) -> Suporte Médico (SM)
+======================================================================
+Demanda do módulo: 9.0 kW | Tensão da rede: 400 V
+
+  Método                         Rota                    Dist.   R (mΩ)    Perda    Efic.
+  ---------------------------------------------------------------------------------------
+  BFS (menos saltos)             AE -> CC -> SM          100 m     80.0   40.5 W   99.55%
+  Dijkstra - menor distância     AE -> H -> SM            90 m     93.0   47.1 W   99.48%
+  Dijkstra - menor resistência   AE -> CC -> SM          100 m     80.0   40.5 W   99.55%
+
+  Rota recomendada pelo SIGIC: AE -> CC -> SM (Dijkstra - menor resistência)
+  A rota mais curta nem sempre é a mais eficiente: cabos degradados
+  aumentam a resistência e, portanto, o desperdício de energia.
+
+======================================================================
+ DIJKSTRA: Comunicação (CM) -> Agricultura (AG)
+======================================================================
+Critério de peso: Latência de comunicação (ms)
+
+--- Passo a passo ---------------------------------------------------
+  1. fixa CM (custo      0) | atualiza: CC=1
+  2. fixa CC (custo      1) | atualiza: AE=4, H=3, LC=3, SM=3
+  3. fixa H  (custo      3) | atualiza: PO=7
+  4. fixa LC (custo      3) | atualiza: AG=8
+  5. fixa SM (custo      3) | atualiza: nenhuma melhoria
+  6. fixa AE (custo      4) | atualiza: nenhuma melhoria
+  7. fixa PO (custo      7) | atualiza: nenhuma melhoria
+  8. fixa AG (custo      8) | atualiza: nenhuma melhoria
+
+  Melhor rota: CM -> CC -> LC -> AG
+  Custo total: 8.0 ms
+  Distância: 200 m | Resistência: 157.0 mΩ | Latência: 8 ms
+
+======================================================================
+ EXPLORAÇÃO DA REDE A PARTIR DE Armazenamento de Energia (AE)
+======================================================================
+
+--- BFS - Busca em largura (camadas por número de saltos) -----------
+  Ordem de visita: AE -> CC -> PO -> H -> AG -> LC -> CM -> SM
+  Nível 0: AE
+  Nível 1: CC, PO, H, AG
+  Nível 2: LC, CM, SM
+
+--- DFS - Busca em profundidade (segue um caminho até o fim) --------
+  Ordem de visita: AE -> CC -> H -> SM -> PO -> AG -> LC -> CM
+  Arestas da árvore DFS: AE-CC, CC-H, H-SM, H-PO, PO-AG, AG-LC, CC-CM
+
+--- Conectividade ---------------------------------------------------
+  Rede CONEXA: todos os 8 módulos operantes se alcançam.
+
+======================================================================
+ CONEXÕES CRÍTICAS DA REDE
+======================================================================
+  Pontos de articulação (módulos que, se falharem, dividem a rede):
+    Centro de Controle (CC)
+  Pontes (conexões que, se caírem, dividem a rede):
+    CC-CM
+  Sugestão do SIGIC: nova conexão LC-CM (50 m) cria um caminho alternativo
+  e elimina a ponte. Teste em: 8. Simulações -> 6. Expansão da rede.
+
+--- Índice de criticidade (falha simulada de cada módulo) -----------
+  CC  índice  3 | sem energia: CM
+  SM  índice  0 | sem energia: -
+  PO  índice  0 | sem energia: -
+  LC  índice  0 | sem energia: -
+  H   índice  0 | sem energia: -
+  CM  índice  0 | sem energia: -
+  AG  índice  0 | sem energia: -
+  AE  índice máx. | é a fonte de toda a energia (ponto único de falha)
+
+======================================================================
+ ANÁLISE DE EFICIÊNCIA OPERACIONAL
+======================================================================
+  Módulos (V): 8 | Conexões (E): 12 | Densidade: 0.43
+  Eficiência global (média de 1/saltos): 0.696
+  Distância média entre módulos: 87.7 m | Diâmetro: 190 m
+
+--- Centralidade dos módulos ----------------------------------------
+  Módulo  Grau   Proximidade   Intermediação
+  AE         4          1.37               4
+  CC         5          1.51               9
+  H          4          1.44               3
+  AG         3          1.03               1
+  LC         2          1.04               0
+  CM         1          0.74               0
+  SM         2          1.13               0
+  PO         3          1.32               2
+
+--- Distribuição de energia a partir do AE (400 V) ------------------
+  Demanda total: 116.0 kW
+  Perdas com rotas BFS (menos saltos):      957.7 W
+  Perdas com rotas de menor distância:      928.3 W
+  Perdas com Dijkstra por resistência:     1132.0 W
+  Perdas com a árvore ÓTIMA (SIGIC):        928.3 W
+    (busca exaustiva: 792 combinações de 7 conexões entre as 12; 169 formam árvores válidas)
+  Economia frente à pior estratégia: 203.8 W (4.89 kWh por dia; 1785 kWh por ano)
+  Eficiência da distribuição: 99.21%
+
+  Fluxo nos cabos da árvore ótima:
+    AE->CC  fluxo  37.0 kW | perda  273.8 W
+    AE->H   fluxo  27.0 kW | perda  218.7 W
+    AE->AG  fluxo  22.0 kW | perda  211.8 W
+    CC->LC  fluxo  15.0 kW | perda   61.9 W
+    CC->CM  fluxo  10.0 kW | perda   30.0 W
+    H->SM  fluxo   9.0 kW | perda   22.8 W
+    AE->PO  fluxo  25.0 kW | perda  109.4 W
+
+  Pontos de articulação: CC | Pontes: CC-CM
+  Recomendação: criar conexão redundante para eliminar as pontes (ver simulação de expansão).
+  Observação: Dijkstra minimiza a resistência de cada rota isolada; como
+  a perda depende do QUADRADO do fluxo somado nos cabos, a árvore ótima
+  divide melhor a carga entre os cabos que saem do armazenamento.
+
+======================================================================
+ SIMULAÇÃO: FALHA DO MÓDULO Habitação (H)
+======================================================================
+  Módulos operando: 8 -> 7
+  Partes da rede após o evento: 1 -> {AE, CC, PO, AG, LC, CM, SM}
+  Todos os módulos operantes continuam recebendo energia.
+
+--- Rotas de energia recalculadas (Dijkstra por menor resistência) --
+  CC  antes: AE -> CC           ( 32 mΩ) | depois: AE -> CC (32 mΩ)
+  AG  antes: AE -> PO -> AG     ( 64 mΩ) | depois: AE -> PO -> AG (64 mΩ)
+  LC  antes: AE -> CC -> LC     ( 76 mΩ) | depois: AE -> CC -> LC (76 mΩ)
+  CM  antes: AE -> CC -> CM     ( 80 mΩ) | depois: AE -> CC -> CM (80 mΩ)
+  SM  antes: AE -> CC -> SM     ( 80 mΩ) | depois: AE -> CC -> SM (80 mΩ)
+  PO  antes: AE -> PO           ( 28 mΩ) | depois: AE -> PO (28 mΩ)
+
+  Perdas na distribuição: 928.3 W -> 860.5 W
+
+======================================================================
+ SIMULAÇÃO: MANUTENÇÃO PROGRAMADA DO MÓDULO Centro de Controle (CC)
+======================================================================
+  Módulos operando: 8 -> 7
+  Partes da rede após o evento: 2 -> {AE, PO, H, AG, SM, LC} | {CM}
+  ALERTA: módulos sem energia: Comunicação (CM)
+    CM: autonomia local 2.0 h (20 kWh / 10 kW)
+
+--- Rotas de energia recalculadas (Dijkstra por menor resistência) --
+  H   antes: AE -> H            ( 48 mΩ) | depois: AE -> H (48 mΩ)
+  AG  antes: AE -> PO -> AG     ( 64 mΩ) | depois: AE -> PO -> AG (64 mΩ)
+  LC  antes: AE -> CC -> LC     ( 76 mΩ) | depois: AE -> PO -> AG -> LC (129 mΩ)  <- rota alterada
+  CM  antes: AE -> CC -> CM     ( 80 mΩ) | depois: SEM ROTA  <- rota alterada
+  SM  antes: AE -> CC -> SM     ( 80 mΩ) | depois: AE -> H -> SM (93 mΩ)  <- rota alterada
+  PO  antes: AE -> PO           ( 28 mΩ) | depois: AE -> PO (28 mΩ)
+
+  Perdas na distribuição: 928.3 W -> 1041.2 W
+
+======================================================================
+ SIMULAÇÃO: ROMPIMENTO DA CONEXÃO CC-CM
+======================================================================
+  A rede foi DIVIDIDA: {AE, CC, PO, H, AG, LC, SM} | {CM}
+  Essa conexão era uma PONTE (conexão crítica).
+  AE -> CC : AE -> CC (32 mΩ)
+  AE -> H  : AE -> H (48 mΩ)
+  AE -> AG : AE -> PO -> AG (64 mΩ)
+  AE -> LC : AE -> CC -> LC (76 mΩ)
+  AE -> CM : (sem rota)
+  AE -> SM : AE -> CC -> SM (80 mΩ)
+  AE -> PO : AE -> PO (28 mΩ)
+
+======================================================================
+ SIMULAÇÃO: CRISE ENERGÉTICA - 80.0 kW DISPONÍVEIS
+======================================================================
+  Demanda total: 116.0 kW | Disponível: 80.0 kW
+  Distribuição por prioridade (smart grid):
+
+  [1-Crítica] Armazenamento de Energia (AE)     atendido     5.0 / 5.0 kW
+  [1-Crítica] Suporte Médico (SM)               atendido     9.0 / 9.0 kW
+  [1-Crítica] Habitação (H)                     atendido    18.0 / 18.0 kW
+  [1-Crítica] Produção de Oxigênio (PO)         atendido    25.0 / 25.0 kW
+  [2-Alta   ] Comunicação (CM)                  atendido    10.0 / 10.0 kW
+  [2-Alta   ] Centro de Controle (CC)           atendido    12.0 / 12.0 kW
+  [3-Média  ] Agricultura (AG)                  desligado    0.0 / 22.0 kW
+  [4-Baixa  ] Laboratório Científico (LC)       desligado    0.0 / 15.0 kW
+
+  Sobra de potência: 0.7 kW
+  Módulos com corte: AG, LC
+
+======================================================================
+ SIMULAÇÃO: TEMPESTADE DE POEIRA (70% menos sol, 72 h)
+======================================================================
+  Reserva inicial do AE: 1400 kWh (70% de 2000 kWh)
+
+  Modo           Geração   Demanda     Saldo   Autonomia  Reserva final  Resultado
+  normal          96.0kW   116.9kW   -20.9kW      66.9 h          0 kWh  ESGOTA
+  economia        96.0kW   101.7kW    -5.7kW     247.1 h        992 kWh  OK
+  emergencia      96.0kW    79.5kW   +16.5kW   ilimitada       2000 kWh  OK
+
+  normal = todos ligados | economia = desliga prioridade 4 | emergencia = só prioridades 1 e 2
+  Recomendação do SIGIC: operar em modo 'economia' (módulos ligados: AE, CC, H, AG, CM, SM, PO).
+
+======================================================================
+ SIMULAÇÃO: EXPANSÃO - NOVA CONEXÃO LC-CM (50 m)
+======================================================================
+  Indicador                                Antes      Depois
+  Conexões                                    12          13
+  Densidade                                 0.43        0.46
+  Eficiência global                        0.696       0.720
+  Distância média (m)                       87.7        82.0
+  Pontos de articulação                       CC           -
+  Pontes                                       1           0
+  Perda de distribuição (W)                928.3       928.3
+
+  Custo da expansão: 50 m de cabo.
+  Benefício: a nova conexão cria redundância e elimina conexões críticas.
+
+======================================================================
+ MODELAGEM MATEMÁTICA 1: PERDA ENERGÉTICA E TENSÃO ÓTIMA
+======================================================================
+  Perda Joule em cada cabo:  P_perda = (F / V)² · R
+  Somando os cabos da árvore de distribuição:  Perdas(V) = K / V²
+  Custo diário total:  C(V) = 24·K / (1000·V²) + β·V   [kWh-eq/dia]
+    F = fluxo de potência no cabo (W)   R = resistência do cabo (Ω)
+    V = tensão de distribuição (V)      K = Σ F²·R (constante da rede)
+    β = custo de isolamento/proteção por volt (kWh-eq/dia/V)
+
+  Valores da Aurora Siger: K = 1.485e+08 W²·Ω | β = 0.04
+  (coeficientes hipotéticos, usados para fins didáticos)
+
+  Derivada:  C'(V) = -48·K/(1000·V³) + β
+  C'(V) = 0  ->  V* = (48·K / (1000·β))^(1/3)
+  C''(V) = 144·K/(1000·V⁴) > 0  ->  V* é ponto de MÍNIMO
+
+  V* analítico (derivada):       562.8 V
+  V* numérico (bisseção em C'):  562.8 V  (18 iterações)
+  C''(V*) = 2.13e-04 > 0  (confirma o mínimo)
+
+--- Tabela C(V) -----------------------------------------------------
+    V (V)  Perdas (W)   Perda/dia  Isolamento      C(V)     C`(V)
+      200      3713.1     89.11kWh      8.00kWh     97.11   -0.8511
+      300      1650.3     39.61kWh     12.00kWh     51.61   -0.2240
+      400       928.3     22.28kWh     16.00kWh     38.28   -0.0714
+      500       594.1     14.26kWh     20.00kWh     34.26   -0.0170
+      563       468.6     11.25kWh     22.52kWh     33.77   +0.0001
+      700       303.1      7.27kWh     28.00kWh     35.27   +0.0192
+      800       232.1      5.57kWh     32.00kWh     37.57   +0.0261
+     1000       148.5      3.56kWh     40.00kWh     43.56   +0.0329
+
+  Hoje (400 V): C = 38.28 kWh-eq/dia | Na tensão ótima: C = 33.77 kWh-eq/dia
+  Economia potencial: 4.51 kWh-eq/dia (11.8%)
+
+  Análise qualitativa: em tensões baixas a perda (1/V²) domina e o custo
+  dispara; em tensões altas o isolamento (linear em V) domina. Existe um
+  único ponto de equilíbrio. Como dP/dF = 2·F·R/V², a perda cresce com o
+  QUADRADO do fluxo: dividir a carga entre dois caminhos reduz a perda à
+  metade - por isso a rede possui rotas redundantes (smart grid).
+
+======================================================================
+ MODELAGEM MATEMÁTICA 2: CRESCIMENTO DO CONSUMO ENERGÉTICO
+======================================================================
+  D(t) = D0 · e^(k·t)      D'(t) = k · D0 · e^(k·t)
+    D0 = demanda atual (kW)   k = taxa de crescimento mensal   t = meses
+    G  = capacidade de geração (kW)
+
+  D0 = 116.0 kW | k = 0.035 (3,5% ao mês, hipotético) | G = 180.0 kW
+
+    Mês   D(t) kW   D`(t) kW/mês  Uso de G
+      0     116.0           4.06     64.4%
+      3     128.8           4.51     71.6%
+      6     143.1           5.01     79.5%
+      9     159.0           5.56     88.3%
+     12     176.5           6.18     98.1%
+     15     196.1           6.86    108.9%
+     18     217.8           7.62    121.0%
+     24     268.7           9.40    149.3%
+
+  Saturação da geração (D(t*) = G): t* = ln(G/D0)/k = 12.6 meses
+  Cenários de otimização (programas de eficiência reduzem k):
+    k = 0.035 -> saturação em  12.6 meses
+    k = 0.025 -> saturação em  17.6 meses
+    k = 0.015 -> saturação em  29.3 meses
+  Interpretação: a derivada cresce junto com D(t) (crescimento acelerado).
+  A expansão de módulos deve ser acompanhada de nova geração ANTES de t*.
+
+======================================================================
+ SUSTENTABILIDADE E GOVERNANÇA (ESG) APLICADA PELO SIGIC
+======================================================================
+  Ambiental
+   - Rotas de menor resistência (Dijkstra) reduzem o desperdício de energia.
+   - Operação próxima da tensão ótima reduz perdas Joule nos cabos.
+   - Excedente das fontes é armazenado no AE em vez de ser descartado.
+   - Substituir o cabo H-SM (degradado) é a melhoria de maior retorno.
+  Social
+   - Prioridade 1 (Habitação, Oxigênio, Médico, Energia) nunca é cortada
+     antes dos demais; o racionamento protege a vida da tripulação.
+  Governança
+   - Decisões do sistema são explicáveis: cada rota mostra o custo e o
+     critério usado; nenhuma ação automática é escondida do operador.
+   - Regras fixas e auditáveis (prioridades em tuplas imutáveis).
+   - Relatórios gravados em arquivos_auxiliares/ servem como trilha de
+     auditoria; mudanças de status são feitas pelo operador humano.
+   - Expansão planejada: só adicionar módulos com geração disponível
+     (modelo de crescimento) e com redundância (sem novas pontes).
