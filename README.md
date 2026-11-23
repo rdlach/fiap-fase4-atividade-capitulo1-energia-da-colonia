@@ -23,7 +23,7 @@ Entrega da Fase 4 (Colônia Aurora Siger). O arquivo principal é o **`codigo_fo
 
 ```bash
 python codigo_fonte.py          # menu interativo
-python codigo_fonte.py --demo   # demonstração de todas as funcionalidades
+python codigo_fonte.py --demo   # demonstração das principais funcionalidades
 ```
 
 | Arquivo | Conteúdo |
@@ -33,4 +33,9 @@ python codigo_fonte.py --demo   # demonstração de todas as funcionalidades
 | `rede_colonia.pdf` | Mapa da rede e árvore ótima de distribuição de energia |
 | `documentacao_complementar.pdf` | Justificativas, algoritmos, modelagem matemática e análise ESG |
 | `link_video.txt` | Link do vídeo no YouTube (não listado) |
-| `roteiro_video.md` | Roteiro do vídeo (apoio da equipe, fora do .zip) |
+
+## Como interpretar os resultados
+
+O peso chamado `perda` representa resistência em miliohms. A perda em watts depende também da potência transportada e da tensão. A árvore de distribuição escolhe um caminho por módulo. A redução teórica de 50% ao dividir uma carga pressupõe dois caminhos de mesma resistência recebendo metade da carga cada.
+
+O relatório registra o estado atual e é substituído a cada exportação. A indicação de trocar o cabo H–SM considera a resistência elétrica. O modelo não calcula o retorno financeiro da troca.
